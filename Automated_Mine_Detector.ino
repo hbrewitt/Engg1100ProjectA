@@ -5,6 +5,9 @@
 
 //Define and setup all pins/constants
 
+#include <Wire.h> //I2C Arduino Library
+#include <Servo.h> //Servo Library
+
  //[1] DriveTrain in PWM Mode
  const int pin_LMotor = 4;
  const int pin_LMotorE = 5; //PWM
@@ -18,9 +21,19 @@
  //[3] Marker
  const int pin_Marker = 11; //PWM
 
+ //[4] Magnetometer
+ #define address 0x1E //0011110b, I2C 7bit address of HMC5883
+
+ //[5] Servo1
+ Servo servo1; 
+ int servo1pos = 0;  
+ Servo servo2;
+ int servo2pos = 0;
+
  //Constants for Drivetrain
  const int FORWARD = LOW;
  const int REVERSE = HIGH;
+ const int MAX_PWR = 150;
  boolean Motor_Direction = FORWARD;
 
  void setup(){
@@ -30,20 +43,38 @@
    pinMode(pin_SR04ECHO, INPUT);
    pinMode(pin_Marker, OUTPUT);
    Serial.begin(9600);
+   Wire.begin();
+   //Put the HMC5883 IC into the correct operating mode
+   Wire.beginTransmission(address); //open communication with HMC5883
+   Wire.write(0x02); //select mode register
+   Wire.write(0x00); //continuous measurement mode
+   Wire.endTransmission();
+   servo1.attach(9);
+   servo2.attach(10);
+   Lower_Arm();
  }
 
  void loop(){
-  if(Ping_Range() < 10){
-      HardTurn(120, FORWARD);
-      delay(100);
+   
+   Ping_Range(); //returns the distance from sr04 for testing purposes
+  
+   //lol
+    if(Ping_Range() < 15){
+      Turn(90, FORWARD);
+      delay(1000);
+      Move(FORWARD);
+      delay(500);
+      Turn(90, FORWARD);
+      delay(1000);
+      Move(FORWARD);
       
-  while(Ping_Range() > 10 {
-        Move(FORWARD);
-        if(detSignal > xyz) {
-          Mark(HIGH)
-          
-      } 
-         
-  }
+    } 
+    else {
+      Move(FORWARD);
+    }
+    //still unsure if this is the best way to go about it 
+   if(servo1pos = 180); {
+     Sweep_Arm();
+   }
  
  }
